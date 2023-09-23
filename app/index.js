@@ -4,6 +4,17 @@ const port = 3000
 const axios = require('axios');
 const {XMLParser} = require('fast-xml-parser');
 const {decode} = require('metar-decoder');
+// import { createClient } from 'redis';
+
+// const redisClient = createClient({ url: 'redis://redis:6379' })
+
+// (async () => {
+//     await redisClient.connect();
+// })();
+
+// process.on('SIGTERM', async () => {
+//     await redisClient.quit();
+// })
 
 app.get('/', (req, res) => {
     res.send('Hello World!')
