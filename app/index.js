@@ -1,20 +1,18 @@
 const express = require('express')
 const app = express()
 const port = 3000
-const axios = require('axios');
-const {XMLParser} = require('fast-xml-parser');
-const {decode} = require('metar-decoder');
-// import { createClient } from 'redis';
+const axios = require('axios')
+const {XMLParser} = require('fast-xml-parser')
+const {decode} = require('metar-decoder')
+const {createClient} = require('redis')
 
-// const redisClient = createClient({ url: 'redis://redis:6379' })
+const redisClient = createClient({ url: 'redis://redis', port: 6379 })
+    .on('error', err => console.log('Redis Client Error', err))
+    .connect();
 
-// (async () => {
-//     await redisClient.connect();
-// })();
-
-// process.on('SIGTERM', async () => {
-//     await redisClient.quit();
-// })
+process.on('SIGTERM', async () => {
+    await redisClient.quit();
+})
 
 app.get('/', (req, res) => {
     res.send('Hello World!')
@@ -45,9 +43,26 @@ app.get('/metar', async (req, res) => {
 
 app.get('/spaceflight_news', async (req, res) => {
     try {
+
+        if(req.query.redis){
+            console.log('Redis activado')
+            const value = await ((await redisClient).get('spaceflight_news'))
+            console.log(value)
+
+            if(value != null){
+                const response = await axios.get('https://api.spaceflightnewsapi.net/v3/articles?_limit=5');
+                const titles = response.data.map(item => item.title);
+                (await redisClient).set('spaceflight_news', JSON.stringify(titles))
+                //res.send(titles) este no funciona
+            }else{
+                res.send(value)
+            }
+        }
+
         const response = await axios.get('https://api.spaceflightnewsapi.net/v3/articles?_limit=5');
         const titles = response.data.map(item => item.title);
         res.send(titles)
+
     } catch (e) {
         console.error(e);
         res.status(500).send('Error al obtener datos');
@@ -62,6 +77,8 @@ app.get('/quote', async (req, res) => {
             'content': response.data.content,
             'author': response.data.author
         })
+
+        
     } catch (e) {
         console.error(e);
         res.status(500).send('Error al obtener datos');
