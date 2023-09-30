@@ -7,8 +7,12 @@ const {decode} = require('metar-decoder')
 const {createClient} = require('redis')
 
 const redisClient = createClient({ url: 'redis://redis', port: 6379 })
-    .on('error', err => console.log('Redis Client Error', err))
-    .connect();
+    .on('error', err => console.log('Redis Client Error', err));
+
+(async () => {
+    await redisClient.connect();
+    console.log('Connected to Redis');
+})();
 
 process.on('SIGTERM', async () => {
     await redisClient.quit();
@@ -36,7 +40,7 @@ app.get('/metar', async (req, res) => {
 
         if (req.query.redis) {
             
-            decodedMetar = await ((await redisClient).get(stationCode));
+            decodedMetar = await redisClient.get(stationCode);
 
             if (decodedMetar == null || decodedMetar == undefined) {
 
@@ -48,8 +52,7 @@ app.get('/metar', async (req, res) => {
                 //Decodificamos el METAR
                 decodedMetar = decode(xml.response.data.METAR.raw_text);
                 
-                (await redisClient).set(stationCode, JSON.stringify(decodedMetar));
-
+                await redisClient.set(stationCode, JSON.stringify(decodedMetar));
             }
 
         } else {
@@ -75,13 +78,13 @@ app.get('/spaceflight_news', async (req, res) => {
 
         if (req.query.redis) {
             
-            titles = await ((await redisClient).get('spaceflight_news'));
+            titles = await redisClient.get('spaceflight_news');
             
             if (titles == null || titles == undefined) {
             
                 const response = await axios.get('https://api.spaceflightnewsapi.net/v3/articles?_limit=5');
                 titles = response.data.map(item => item.title);
-                (await redisClient).set('spaceflight_news', JSON.stringify(titles));
+                await redisClient.set('spaceflight_news', JSON.stringify(titles));
             
             }
 
