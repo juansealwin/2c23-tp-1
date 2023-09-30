@@ -26,16 +26,50 @@ app.get('/metar', async (req, res) => {
     try {
         const parser = new XMLParser();
         const stationCode = req.query.station;
-        if(!stationCode)
+
+        console.log(req.query)
+
+        if (!stationCode)
             return res.status(400).send("Especifique el aeródromo con ?station={code}");
 
-        const response = await axios.get(`https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&stationString=${stationCode}&hoursBeforeNow=1`);
-        //Convertimos el XML obtenido a JSON, por conveniencia
-        const parsed = parser.parse(response.data);
-        //Decodificamos el METAR
-        const decodedMetar = decode(parsed.response.data.METAR.raw_text);
+        const url = `https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&stationString=${stationCode}&hoursBeforeNow=1`;
 
-        res.send(decodedMetar)
+        let response, parsed, decodedMetar;
+
+        if (req.query.redis) {
+            
+            parsed = await ((await redisClient).get(url));
+            console.log("Se activo redis");
+            console.log("response:" + response);
+
+            if (parsed == null || parsed == undefined) {
+                console.log("response es null");
+                response = await axios.get(url);
+                console.log("response de la api"+ response.data);
+                //Convertimos el XML obtenido a JSON, por conveniencia
+                parsed = parser.parse(response.data);
+
+                //Decodificamos el METAR
+                decodedMetar = decode(parsed.response.data.METAR.raw_text);
+                console.log(decodedMetar)
+                console.log(JSON.stringify(decodedMetar))
+                await redisClient.set(url, JSON.stringify(decodedMetar));
+
+            }
+
+        } else {
+            response = await axios.get(url);
+            //Convertimos el XML obtenido a JSON, por conveniencia
+            parsed = parser.parse(response.data);
+
+            //Decodificamos el METAR
+            decodedMetar = decode(parsed.response.data.METAR.raw_text);
+        }
+        
+        
+
+        res.send(decodedMetar);
+
     } catch (error) {
         res.status(500).send('Error al obtener datos');
     }
@@ -44,26 +78,29 @@ app.get('/metar', async (req, res) => {
 
 app.get('/spaceflight_news', async (req, res) => {
     try {
-        let titles
+        let titles;
 
-        if(req.query.redis){
-            titles = await ((await redisClient).get('spaceflight_news'))
-
-            if(titles != null){
-                const response = await axios.get('https://api.spaceflightnewsapi.net/v3/articles?_limit=5')
-                titles = response.data.map(item => item.title)
-                (await redisClient).set('spaceflight_news', JSON.stringify(titles))
+        if (req.query.redis) {
+            
+            titles = await ((await redisClient).get('spaceflight_news'));
+          
+            if (titles == null || titles == undefined) {
+            
+                const response = await axios.get('https://api.spaceflightnewsapi.net/v3/articles?_limit=5');
+                titles = response.data.map(item => item.title);
+                await redisClient.set('spaceflight_news', JSON.stringify(titles));
+            
             }
 
-        }else{
-            const response = await axios.get('https://api.spaceflightnewsapi.net/v3/articles?_limit=5')
-            titles = response.data.map(item => item.title)
+        } else {
+            const response = await axios.get('https://api.spaceflightnewsapi.net/v3/articles?_limit=5');
+            titles = response.data.map(item => item.title);
         }
         
-        res.send(titles)
+        res.send(titles);
 
-    } catch (e) {
-        console.error(e);
+    } catch (error) {
+        console.error(error);
         res.status(500).send('Error al obtener datos');
     }
 })
@@ -78,8 +115,8 @@ app.get('/quote', async (req, res) => {
         })
 
         
-    } catch (e) {
-        console.error(e);
+    } catch (error) {
+        console.error(error);
         res.status(500).send('Error al obtener datos');
     }
 })
