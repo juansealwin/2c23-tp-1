@@ -27,46 +27,39 @@ app.get('/metar', async (req, res) => {
         const parser = new XMLParser();
         const stationCode = req.query.station;
 
-        console.log(req.query)
-
         if (!stationCode)
             return res.status(400).send("Especifique el aeródromo con ?station={code}");
 
         const url = `https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&stationString=${stationCode}&hoursBeforeNow=1`;
 
-        let response, parsed, decodedMetar;
+        let response, decodedMetar;
 
         if (req.query.redis) {
             
-            parsed = await ((await redisClient).get(url));
-            console.log("Se activo redis");
-            console.log("response:" + response);
+            decodedMetar = await ((await redisClient).get(stationCode));
 
-            if (parsed == null || parsed == undefined) {
-                console.log("response es null");
+            if (decodedMetar == null || decodedMetar == undefined) {
+
                 response = await axios.get(url);
-                console.log("response de la api"+ response.data);
+
                 //Convertimos el XML obtenido a JSON, por conveniencia
-                parsed = parser.parse(response.data);
+                xml = parser.parse(response.data);
 
                 //Decodificamos el METAR
-                decodedMetar = decode(parsed.response.data.METAR.raw_text);
-                console.log(decodedMetar)
-                console.log(JSON.stringify(decodedMetar))
-                await redisClient.set(url, JSON.stringify(decodedMetar));
+                decodedMetar = decode(xml.response.data.METAR.raw_text);
+                
+                (await redisClient).set(stationCode, JSON.stringify(decodedMetar));
 
             }
 
         } else {
             response = await axios.get(url);
             //Convertimos el XML obtenido a JSON, por conveniencia
-            parsed = parser.parse(response.data);
-
+            xml = parser.parse(response.data);
+    
             //Decodificamos el METAR
-            decodedMetar = decode(parsed.response.data.METAR.raw_text);
+            decodedMetar = decode(xml.response.data.METAR.raw_text);
         }
-        
-        
 
         res.send(decodedMetar);
 
@@ -83,12 +76,12 @@ app.get('/spaceflight_news', async (req, res) => {
         if (req.query.redis) {
             
             titles = await ((await redisClient).get('spaceflight_news'));
-          
+            
             if (titles == null || titles == undefined) {
             
                 const response = await axios.get('https://api.spaceflightnewsapi.net/v3/articles?_limit=5');
                 titles = response.data.map(item => item.title);
-                await redisClient.set('spaceflight_news', JSON.stringify(titles));
+                (await redisClient).set('spaceflight_news', JSON.stringify(titles));
             
             }
 
