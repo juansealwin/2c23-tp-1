@@ -41,26 +41,25 @@ app.get('/metar', async (req, res) => {
     }
 })
 
+
 app.get('/spaceflight_news', async (req, res) => {
     try {
+        let titles
 
         if(req.query.redis){
-            console.log('Redis activado')
-            const value = await ((await redisClient).get('spaceflight_news'))
-            console.log(value)
+            titles = await ((await redisClient).get('spaceflight_news'))
 
-            if(value != null){
-                const response = await axios.get('https://api.spaceflightnewsapi.net/v3/articles?_limit=5');
-                const titles = response.data.map(item => item.title);
+            if(titles != null){
+                const response = await axios.get('https://api.spaceflightnewsapi.net/v3/articles?_limit=5')
+                titles = response.data.map(item => item.title)
                 (await redisClient).set('spaceflight_news', JSON.stringify(titles))
-                //res.send(titles) este no funciona
-            }else{
-                res.send(value)
             }
-        }
 
-        const response = await axios.get('https://api.spaceflightnewsapi.net/v3/articles?_limit=5');
-        const titles = response.data.map(item => item.title);
+        }else{
+            const response = await axios.get('https://api.spaceflightnewsapi.net/v3/articles?_limit=5')
+            titles = response.data.map(item => item.title)
+        }
+        
         res.send(titles)
 
     } catch (e) {
