@@ -30,7 +30,6 @@ function delay(time) {
 
 app.get('/ping', async (req, res) => {
     const startTime = Date.now();
-    await delay(500);
     res.send('Pong!');
     statsd.timing('customMetric.ping', Date.now() - startTime);
 })
