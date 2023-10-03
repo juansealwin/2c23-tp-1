@@ -605,6 +605,7 @@
         "type": "graphite",
         "uid": "ca5a556a-0937-4fbf-a25d-00975e4de863"
       },
+      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -686,6 +687,287 @@
         "w": 24,
         "x": 0,
         "y": 28
+      },
+      "id": 10,
+      "links": [],
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "width": 250
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "ca5a556a-0937-4fbf-a25d-00975e4de863"
+          },
+          "refCount": 0,
+          "refId": "C",
+          "target": "alias(stats.*.customMetric.metar_time_request.upper, 'Metar')"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "ca5a556a-0937-4fbf-a25d-00975e4de863"
+          },
+          "hide": false,
+          "refCount": 0,
+          "refId": "B",
+          "target": "alias(stats.*.customMetric.spaceflight_news_time_request.upper, 'Spaceflight')"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "ca5a556a-0937-4fbf-a25d-00975e4de863"
+          },
+          "hide": false,
+          "refCount": 0,
+          "refId": "D",
+          "target": "alias(stats.*.customMetric.quote_time_request.upper, 'Quote')"
+        }
+      ],
+      "title": "Max API response time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "ca5a556a-0937-4fbf-a25d-00975e4de863"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 12,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "always",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byValue",
+              "options": {
+                "op": "gte",
+                "reducer": "allIsNull",
+                "value": 0
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": true,
+                  "viz": false
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 35
+      },
+      "id": 11,
+      "links": [],
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "width": 250
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "ca5a556a-0937-4fbf-a25d-00975e4de863"
+          },
+          "refCount": 0,
+          "refId": "C",
+          "target": "alias(stats.*.customMetric.metar_time_request.mean, 'Metar')"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "ca5a556a-0937-4fbf-a25d-00975e4de863"
+          },
+          "hide": false,
+          "refCount": 0,
+          "refId": "B",
+          "target": "alias(stats.*.customMetric.spaceflight_news_time_request.mean, 'Spaceflight')"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "ca5a556a-0937-4fbf-a25d-00975e4de863"
+          },
+          "hide": false,
+          "refCount": 0,
+          "refId": "D",
+          "target": "alias(stats.*.customMetric.quote_time_request.mean, 'Quote')"
+        }
+      ],
+      "title": "Mean API response time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "graphite",
+        "uid": "ca5a556a-0937-4fbf-a25d-00975e4de863"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 12,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "always",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byValue",
+              "options": {
+                "op": "gte",
+                "reducer": "allIsNull",
+                "value": 0
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": true,
+                  "viz": false
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 42
       },
       "id": 8,
       "links": [],
@@ -829,7 +1111,7 @@
         "h": 7,
         "w": 24,
         "x": 0,
-        "y": 35
+        "y": 49
       },
       "hideTimeOverride": false,
       "id": 1,
@@ -996,6 +1278,6 @@
   "timezone": "",
   "title": "Main dashboard 2",
   "uid": "afewsdfewfw",
-  "version": 2,
+  "version": 3,
   "weekStart": ""
 }
