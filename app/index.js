@@ -5,6 +5,12 @@ const axios = require('axios')
 const {XMLParser} = require('fast-xml-parser')
 const {decode} = require('metar-decoder')
 const {createClient} = require('redis')
+const {StatsD} = require('hot-shots')
+
+const statsd = new StatsD({
+    host: 'graphite',
+    port: 8125
+})
 
 const redisClient = createClient({ url: 'redis://redis', port: 6379 })
     .on('error', err => console.log('Redis Client Error', err));
@@ -18,15 +24,19 @@ process.on('SIGTERM', async () => {
     await redisClient.quit();
 })
 
-app.get('/', (req, res) => {
-    res.send('Hello World!')
-})
+function delay(time) {
+    return new Promise(resolve => setTimeout(resolve, time));
+}
 
-app.get('/ping', (req, res) => {
-    res.send('Pong!')
+app.get('/ping', async (req, res) => {
+    const startTime = Date.now();
+    await delay(500);
+    res.send('Pong!');
+    statsd.timing('customMetric.ping', Date.now() - startTime);
 })
 
 app.get('/metar', async (req, res) => {
+    const startTime = Date.now();
     try {
         const parser = new XMLParser();
         const stationCode = req.query.station;
@@ -44,7 +54,9 @@ app.get('/metar', async (req, res) => {
 
             if (decodedMetar == null || decodedMetar == undefined) {
 
+                const startRequestTime = Date.now();
                 response = await axios.get(url);
+                statsd.timing('customMetric.metar_time_request', Date.now() - startRequestTime);
 
                 //Convertimos el XML obtenido a JSON, por conveniencia
                 xml = parser.parse(response.data);
@@ -52,11 +64,14 @@ app.get('/metar', async (req, res) => {
                 //Decodificamos el METAR
                 decodedMetar = decode(xml.response.data.METAR.raw_text);
                 
-                await redisClient.set(stationCode, JSON.stringify(decodedMetar));
+                await redisClient.set(stationCode, JSON.stringify(decodedMetar), {EX: 3});
             }
 
         } else {
+            const startRequestTime = Date.now();
             response = await axios.get(url);
+            statsd.timing('customMetric.metar_time_request', Date.now() - startRequestTime);
+
             //Convertimos el XML obtenido a JSON, por conveniencia
             xml = parser.parse(response.data);
     
@@ -68,13 +83,18 @@ app.get('/metar', async (req, res) => {
 
     } catch (error) {
         res.status(500).send('Error al obtener datos');
+    } finally {
+        statsd.timing('customMetric.metar', Date.now() - startTime);
     }
 })
 
 
 app.get('/spaceflight_news', async (req, res) => {
+    const startTime = Date.now();
     try {
-        let titles;
+        let response, titles;
+
+        const url = 'https://api.spaceflightnewsapi.net/v3/articles?_limit=5'
 
         if (req.query.redis) {
             
@@ -82,14 +102,19 @@ app.get('/spaceflight_news', async (req, res) => {
             
             if (titles == null || titles == undefined) {
             
-                const response = await axios.get('https://api.spaceflightnewsapi.net/v3/articles?_limit=5');
+                const startRequestTime = Date.now();
+                response = await axios.get(url);
+                statsd.timing('customMetric.spaceflight_news_time_request', Date.now() - startRequestTime);
+
                 titles = response.data.map(item => item.title);
-                await redisClient.set('spaceflight_news', JSON.stringify(titles));
+                await redisClient.set('spaceflight_news', JSON.stringify(titles), {EX: 3});
             
             }
 
         } else {
-            const response = await axios.get('https://api.spaceflightnewsapi.net/v3/articles?_limit=5');
+            const startRequestTime = Date.now();
+            response = await axios.get(url);
+            statsd.timing('customMetric.spaceflight_news_time_request', Date.now() - startRequestTime);
             titles = response.data.map(item => item.title);
         }
         
@@ -98,22 +123,29 @@ app.get('/spaceflight_news', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).send('Error al obtener datos');
+    } finally {
+        statsd.timing('customMetric.spaceflight_news', Date.now() - startTime);
     }
 })
 
 app.get('/quote', async (req, res) => {
+    const startTime = Date.now();
     try {
+
+        const startRequestTime = Date.now();
         const response = await axios.get('https://api.quotable.io/random');
+        statsd.timing('customMetric.quote_time_request', Date.now() - startRequestTime);
 
         res.send({
             'content': response.data.content,
             'author': response.data.author
         })
-
         
     } catch (error) {
         console.error(error);
         res.status(500).send('Error al obtener datos');
+    } finally {
+        statsd.timing('customMetric.quote', Date.now() - startTime);
     }
 })
 
