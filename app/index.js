@@ -88,7 +88,6 @@ app.get('/metar', async (req, res) => {
     }
 })
 
-
 app.get('/spaceflight_news', async (req, res) => {
     const startTime = Date.now();
     try {

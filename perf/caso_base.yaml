@@ -11,6 +11,9 @@ config:
   pool: 50 # All HTTP requests from all virtual users will be sent over the same connections
 
   phases:
+    - name: Warm up
+      duration: 60
+      arrivalRate: 2
     - name: Ramp up
       duration: 30
       arrivalRate: 2
@@ -22,8 +25,9 @@ config:
       duration: 30
       arrivalRate: 10
       rampTo: 2
-    - pause: 60
-    
+    - name: Cool down
+      duration: 60
+      arrivalRate: 2
 
 scenarios:
   - name: Ping (/ping)
@@ -31,3 +35,21 @@ scenarios:
     flow:
       - get:
           url: '/ping'
+
+  - name: Metar (/metar)
+    weight: 1
+    flow:
+      - get:
+          url: '/metar?station=SAEZ'
+
+  - name: Spaceflight News (/spaceflight_news)
+    weight: 1
+    flow:
+      - get:
+          url: '/spaceflight_news'
+
+  - name: Quote (/quote)
+    weight: 1
+    flow:
+      - get:
+          url: '/quote'
