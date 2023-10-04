@@ -1,3 +1,27 @@
+
+## Introducción
+
+En el siguiente trabajo práctico se compararon diferentes tácticas y tecnologías para analizar cómo impacta en los atributos de calidad de un servicio HTTP implementado en Node con Express-js. Para ello, implementaremos una API que, mediante el consumo de otras APIs, brindará distintos datos a los usuarios. Con `Artillery` se someterá a los endpoints de la API a diversas intensidades de carga y con distintas configuraciones, para luego medir y analizar los resultados obtenidos.
+
+El webserver que provee los distintos endpoints estará dockerizado con junto con los servicios que nos ayudarán a tomar mediciones sobre la API (`Graphite`, `Grafana` y `Cadvisor`), un servicio de base de datos para usar como caché (`Redis`) y un servicio de reverse proxy (`Nginx`).
+
+Los endpoints que se desarrollaron para el webserver son los siguientes:
+
+- `Ping`: para healthcheck
+- `METAR`: para obtener información meteorológica de un aeródromo
+- `Spaceflight News`: para obtener las últimas noticias sobre actividad espacial
+- `Random Quote`: para obtener una cita famosa aleatoria.
+
+A la hora de comparar las distintas tácticas se evaluaran distintos escenarios:
+- Un caso base que simplemente hará request a los distintos endpoints
+- Uso de caching con mediante Redis
+- Escalando el servicio a 3 réplicas
+- Rate limiting para limitar el consumo de los distintos endpoint
+
+Para evaluar estos escenarios se generaron distintos escenarios de carga para un posterior análisis de cómo afecta a los atributos de calidad de la aplicación.
+
+
+
 # Sin tácticas 
 
 ## Caso base
