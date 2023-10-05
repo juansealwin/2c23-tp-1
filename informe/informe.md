@@ -115,7 +115,7 @@ Empezó a fallar la api de Quote, el log de Node de las requests fallidas es el 
 2c23-tp-1-node-1      |     url: 'https://api.quotable.io/random',
 2c23-tp-1-node-1      |     data: undefined
 
-.... mucho texto al pedo
+....
 
 2c23-tp-1-node-1      |   },
 2c23-tp-1-node-1      |   response: {
@@ -221,7 +221,7 @@ Empezó a fallar la api de Quote, el log de Node de las requests fallidas es el 
 2c23-tp-1-node-1      | }
 ```
 
-LLegando al maximo de requests por segundo a la api de Quote (270 por seg) el servidor empezó a devolver status 429. En el grafico de max api response time y mean api response time podemos ver que faltan puntos de entrada a partir del tiempo 16:14:00, eso es porqeu nos dejo de contestar por aprox 1 minuto, y lo mismo se repite despues. 
+LLegando al maximo de requests por segundo a la api de Quote (270 por seg) el servidor empezó a devolver status 429. En el grafico de max api response time y mean api response time podemos ver que faltan puntos de entrada a partir del tiempo 16:14:00, eso es porque nos dejo de contestar por aprox 1 minuto, y lo mismo se repite despues. 
 
 En el log de la response vemos que el rate-limit del servidor son 220 requests, y dice "retry-after" 60 segundos. Esto condice con lo que vemos en los graficos. 
 

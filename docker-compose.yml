@@ -5,6 +5,17 @@ services:
         build: ./app
         links:
             - redis   
+  
+    # Load balancer
+    # node2:
+    #     build: ./app
+    #     links:
+    #         - redis   
+
+    # node3:
+    #     build: ./app
+    #     links:
+    #         - redis   
 
     redis:
         image: redis:7
@@ -18,6 +29,10 @@ services:
             - ./store/static/files:/static:ro
         links:
             - node
+            # Load balancer
+            # - node2
+            # - node3
+
 
     graphite:
         image: graphiteapp/graphite-statsd:1.1.10-5
