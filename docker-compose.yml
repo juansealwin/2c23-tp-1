@@ -1,21 +1,26 @@
 version: '3'
 
 services:
-    node:
+    # node:
+    #     build: ./app
+    #     links:
+    #         - redis   
+  
+    # Load balancer config
+    node1:
         build: ./app
         links:
             - redis   
-  
-    # Load balancer
-    # node2:
-    #     build: ./app
-    #     links:
-    #         - redis   
 
-    # node3:
-    #     build: ./app
-    #     links:
-    #         - redis   
+    node2:
+        build: ./app
+        links:
+            - redis   
+
+    node3:
+        build: ./app
+        links:
+            - redis   
 
     redis:
         image: redis:7
@@ -28,10 +33,11 @@ services:
             - ./nginx_reverse_proxy.conf:/etc/nginx/conf.d/default.conf:ro
             - ./store/static/files:/static:ro
         links:
-            - node
-            # Load balancer
-            # - node2
-            # - node3
+            #- node
+            # Load balancer config
+            - node1
+            - node2
+            - node3
 
 
     graphite:

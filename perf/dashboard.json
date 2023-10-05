@@ -685,7 +685,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -825,7 +826,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -964,7 +966,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1092,7 +1095,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1174,7 +1178,7 @@
           },
           "hide": false,
           "refCount": 0,
-          "refId": "C",
+          "refId": "Cpu",
           "target": "alias(removeBelowValue(asPercent(derivative(keepLastValue(stats.gauges.cadvisor.2c23-tp-1-node-1.cpu_cumulative_usage, 100)), 10000000000), 0.0001), 'CPU')",
           "textEditor": false
         },
@@ -1185,15 +1189,75 @@
           },
           "hide": false,
           "refCount": 0,
-          "refId": "B",
+          "refId": "Mem",
           "target": "alias(asPercent(stats.gauges.cadvisor.2c23-tp-1-node-1.memory_usage, 10000000000), 'Memory')"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "${DS_GRAPHITE}"
+          },
+          "hide": false,
+          "refCount": 0,
+          "refId": "Cpu - nodo1",
+          "target": "alias(removeBelowValue(asPercent(derivative(keepLastValue(stats.gauges.cadvisor.2c23-tp-1-node1-1.cpu_cumulative_usage, 100)), 10000000000), 0.0001), 'CPU node1')"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "${DS_GRAPHITE}"
+          },
+          "hide": false,
+          "refCount": 0,
+          "refId": "Mem - nodo1",
+          "target": "alias(asPercent(stats.gauges.cadvisor.2c23-tp-1-node1-1.memory_usage, 10000000000), 'Memory node1')"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "${DS_GRAPHITE}"
+          },
+          "hide": false,
+          "refCount": 0,
+          "refId": "Cpu - nodo2",
+          "target": "alias(removeBelowValue(asPercent(derivative(keepLastValue(stats.gauges.cadvisor.2c23-tp-1-node2-1.cpu_cumulative_usage, 100)), 10000000000), 0.0001), 'CPU node2')"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "${DS_GRAPHITE}"
+          },
+          "hide": false,
+          "refCount": 0,
+          "refId": "Mem - nodo2",
+          "target": "alias(asPercent(stats.gauges.cadvisor.2c23-tp-1-node2-1.memory_usage, 10000000000), 'Memory node2')"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "${DS_GRAPHITE}"
+          },
+          "hide": false,
+          "refCount": 0,
+          "refId": "Cpu - node3",
+          "target": "alias(removeBelowValue(asPercent(derivative(keepLastValue(stats.gauges.cadvisor.2c23-tp-1-node3-1.cpu_cumulative_usage, 100)), 10000000000), 0.0001), 'CPU node3')"
+        },
+        {
+          "datasource": {
+            "type": "graphite",
+            "uid": "${DS_GRAPHITE}"
+          },
+          "hide": false,
+          "refCount": 0,
+          "refId": "Mem - node3",
+          "target": "alias(asPercent(stats.gauges.cadvisor.2c23-tp-1-node3-1.memory_usage, 10000000000), 'Memory node3')"
         }
       ],
       "title": "Resources",
       "type": "timeseries"
     }
   ],
-  "refresh": "",
+  "refresh": "5s",
   "schemaVersion": 38,
   "style": "dark",
   "tags": [],

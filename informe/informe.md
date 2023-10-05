@@ -238,3 +238,70 @@ Metar se ve que tiene picos de latencia alta, donde llega a 1.1 segundos de resp
 ![img_6.png](img_6.png)
 ![img_7.png](img_7.png)
 ![img_8.png](img_8.png)
+
+
+# Caché
+
+## Caso base
+
+![redis_caso_base_1.png](redis_caso_base_1.png)
+![redis_caso_base_2.png](redis_caso_base_2.png)
+![redis_caso_base_3.png](redis_caso_base_3.png)
+![redis_caso_base_4.png](redis_caso_base_4.png)
+
+
+## Stress
+
+![redis_stress_1.png](redis_stress_1.png)
+![redis_stress_2.png](redis_stress_2.png)
+![redis_stress_3.png](redis_stress_3.png)
+![redis_stress_4.png](redis_stress_4.png)
+
+# Replicación
+
+## Caso base
+
+![replicas_base_1.png](replicas_caso_base_1.png)
+![replicas_base_2.png](replicas_caso_base_2.png)
+![replicas_base_3.png](replicas_caso_base_3.png)
+![replicas_base_4.png](replicas_caso_base_4.png)
+
+## Stress
+
+![replicas_stress_1.png](replicas_stress_1.png)
+![replicas_stress_2.png](replicas_stress_2.png)
+![replicas_stress_3.png](replicas_stress_3.png)
+![replicas_stress_4.png](replicas_stress_4.png)
+
+# Rate limiting
+
+## Caso base
+
+![ratelimit_base_1.png](ratelimit_caso_base_1.png)
+![ratelimit_base_2.png](ratelimit_caso_base_2.png)
+![ratelimit_base_3.png](ratelimit_caso_base_3.png)
+![ratelimit_base_4.png](ratelimit_caso_base_4.png)
+
+## Stress
+
+![ratelimit_stress_1.png](ratelimit_stress_1.png)
+![ratelimit_stress_2.png](ratelimit_stress_2.png)
+![ratelimit_stress_3.png](ratelimit_stress_3.png)
+![ratelimit_stress_4.png](ratelimit_stress_4.png)
+
+# Replicación + Caché 
+
+## Caso base
+
+![replicasyredis_base_1.png](replicasyredis_caso_base_1.png)
+![replicasyredis_base_2.png](replicasyredis_caso_base_2.png)
+![replicasyredis_base_3.png](replicasyredis_caso_base_3.png)
+![replicasyredis_base_4.png](replicasyredis_caso_base_4.png)
+
+## Stress
+
+![replicasyredis_stress_1.png](replicasyredis_stress_1.png)
+![replicasyredis_stress_2.png](replicasyredis_stress_2.png)
+![replicasyredis_stress_3.png](replicasyredis_stress_3.png)
+![replicasyredis_stress_4.png](replicasyredis_stress_4.png)
+
