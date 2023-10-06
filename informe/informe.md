@@ -91,7 +91,7 @@ En el primer gráfico podemos observar la cantidad de solicitudes al servidor de
 Estos gráficos representan el tiempo total de respuesta que le lleva a cada uno de los endpoints de la API, medido desde el lado del servidor.
 
 ![base_caso_base_3.png](base_caso_base_3.png)
-Aquí se representa el tiempo de respuesta para obtener la información de cada API externa. Podemos observar que `/space_flight` y `/quote` son los cuales presentan mayor latencia, llegando a superar la unidad de segundos.
+Aquí se representa el tiempo de respuesta para obtener la información de cada API externa. Podemos observar que `/space_flight` y `/quote` son los cuales presentan mayor latencia, llegando a superar la barrera del segundo.
 
 ![base_caso_base_4.png](base_caso_base_4.png)
 
@@ -100,7 +100,7 @@ En el primer gráfico, vemos el tiempo de respuesta combinado desde el lado del 
 ### Escenario stress:
 
 Al iniciarlo, empezamos a obtener fallas provenientes de la API de Quote.
-Del reporte de Node, pudimos obtener que se trata de errores 429 (too many requests) y que el servidor de destino especifica que el rate-limit es de 220 por minuto y un retry-after de 60 segundos.
+Del reporte de Node, pudimos obtener que se trata de errores 429 (Too Many Requests) y que el servidor de destino especifica que el rate-limit es de 220 por minuto y un retry-after de 60 segundos.
 
 ![base_stress_1.png](base_stress_1.png)
 ![base_stress_2.png](base_stress_2.png)
