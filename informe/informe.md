@@ -129,11 +129,18 @@ Este caso tiene una implementacción de base de datos Redis para la caché. La i
 ![redis_caso_base_1.png](redis_caso_base_1.png)
 ![redis_caso_base_2.png](redis_caso_base_2.png)
 
-En el gráfico "Max endpoint response time", lo que se puede observar es que los picos donde la caché no fue utilizada. Como estos picos son los máximos dentro de la ventana de diez segundos, el grafico parece constante.
+En estos dos últimos gráficos, se debería observar unos tiempos de respuesta promedio más alto para "metar" y "spaceflight", 
+ya que aunque se encuentra almacenado en caché, cada 3 segundos se realiza una nueva petición a la API externa, lo que debería incremental el valor promedio en esa zona.
 
-Por otro lado el segundo gráfico "Mean endpoint response time", se observa que el tiempo promedio de latencia de los endpoint baja significativamente.
+Para comprobarlo corrimos algunas pruebas en otra máquina y esta vez si obtuvimos los resultados esperados.
 
-Por ejemplo, si tomamos el caso de "Spaceflight", podemos ver que cuando realiza las solicitudes al servidor tarda 852ms en promedio, pero cuando utiliza la caché el promedio baja a 247ms.
+![base_con_cache_2.png](base_con_cache_2.png)
+
+
+Si tomamos el caso de "Spaceflight" sin caché, podemos ver que cuando realiza las solicitudes al servidor tarda más de 1 segundo en promedio, pero cuando utiliza la caché el promedio baja a 247ms, por lo que la mejora es significativa al implementar esta táctica.
+
+Si en el gráfico tuvieramos más granularidad podriamos observar picos de latencia cada 3 segundos cuando se invalida la caché. Como las mediciones se realizan cada 10 segundos, en el gráfico de arriba (el de máximos) estamos viendo solo los puntos más altos de latencia, mientras que en el gráfico de abajo vemos el promedio que es mucho más bajo.
+
 
 ![redis_caso_base_3.png](redis_caso_base_3.png)
 ![redis_caso_base_4.png](redis_caso_base_4.png)
