@@ -102,17 +102,17 @@ En el primer gráfico, vemos el tiempo de respuesta combinado desde el lado del 
 Al iniciarlo, empezamos a obtener fallas provenientes de la API de Quote.
 Del reporte de Node, pudimos obtener que se trata de errores 429 (too many requests) y que el servidor de destino especifica que el rate-limit es de 220 por minuto y un retry-after de 60 segundos.
 
-![stress_sin_tacticas_1.png](stress_sin_tacticas_1.png)
-![stress_sin_tacticas_2.png](stress_sin_tacticas_2.png)
-![stress_sin_tacticas_3.png](stress_sin_tacticas_3.png)
+![base_stress_1.png](base_stress_1.png)
+![base_stress_2.png](base_stress_2.png)
+![base_stress_3.png](base_stress_3.png)
 
 Podemos observar que los endpoints con conexiones a APIs externas tienen una peor performance ante el estrés que el caso de `/ping`. También, `/metar` muestra ser el de mejor rendimiento en todas las pruebas con saltos en latencia más leves que los otros.
 
-![stress_sin_tacticas_4.png](stress_sin_tacticas_4.png)
+![base_stress_4.png](base_stress_4.png)
 
 Aquí se puede observar que el `/quote` presenta un comportamiento lineal en periodos de 60 segundos y eso es debido a la limitación de solicitudes impuesta por el servidor externo. Durante ese periodo, todas las solicitudes fueron rechazadas.
 
-![stress_sin_tacticas_5.png](stress_sin_tacticas_5.png)
+
 
 Al tener un sólo nodo atendiendo todas las solicitudes, el CPU muestra un pico máximo de 47.6%, mientras que la memoria no sufrió cambios significativos en toda la prueba.
 
@@ -126,8 +126,8 @@ Este caso tiene una implementacción de base de datos Redis para la caché. La i
 
 ## Escenario base
 
-![base_con_cache_1.png](base_con_cache_1.png)
-![base_con_cache_2.png](base_con_cache_2.png)
+![redis_caso_base_1.png](redis_caso_base_1.png)
+![redis_caso_base_2.png](redis_caso_base_2.png)
 
 En el gráfico "Max endpoint response time", lo que se puede observar es que los picos donde la caché no fue utilizada. Como estos picos son los máximos dentro de la ventana de diez segundos, el grafico parece constante.
 
@@ -135,22 +135,22 @@ Por otro lado el segundo gráfico "Mean endpoint response time", se observa que 
 
 Por ejemplo, si tomamos el caso de "Spaceflight", podemos ver que cuando realiza las solicitudes al servidor tarda 852ms en promedio, pero cuando utiliza la caché el promedio baja a 247ms.
 
-![base_con_cache_3.png](base_con_cache_3.png)
-![base_con_cache_4.png](base_con_cache_4.png)
+![redis_caso_base_3.png](redis_caso_base_3.png)
+![redis_caso_base_4.png](redis_caso_base_4.png)
 
 
 ## Escenario stress
 
-![feli_stress_con_cache.png](feli_stress_con_cache.png)
+![redis_stress_1.png](redis_stress_1.png)
 
 Aquí se puede observar un aumento de las solicitudes con errores. Esto se puede explicar por el endpoint "/quote", el cual no posee implementación de caché pero lo seguimos evaluando para su comparativa con el resto de los endpoint en términos de rendimiento general. También consideramos que dicha API externa no es tan robusta como las demás para este tipo de usos. 
 
-![feli_stress_con_cache_2.png](feli_stress_con_cache_2.png)
+![redis_stress_2.png](redis_stress_2.png)
 
 Podemos observar que "Max endpoint response time" nos arroja unos resultados más constantes en el caso de "Spaceflight" y "Metar" comparando con el escenario Stress sin caché. Ya no aparecen picos de latencia alta.
 
-![feli_stress_con_cache_3.png](feli_stress_con_cache_3.png)
-![feli_stress_con_cache_4.png](feli_stress_con_cache_4.png)
+![redis_stress_3.png](redis_stress_3.png)
+![redis_stress_4.png](redis_stress_4.png)
 No se observan cambios significativos en el uso de la memoria.
 
 # Replicación
