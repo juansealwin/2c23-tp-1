@@ -1,3 +1,18 @@
+## Tp. Nro. 1: Tácticas 
+
+## Materia: Arquitectura del Software (75.73)
+
+**Alumnos**:
+  * Gorge Julián, 104286
+  * Marelli Felipe, 106521
+  * Alvarez Windey Juan, 95242
+  * Rettori Julián, 106581
+
+# Fecha de Entrega: 05 - 10 - 23
+
+---
+
+
 
 ## Introducción
 
