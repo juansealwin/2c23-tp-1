@@ -1,9 +1,9 @@
 
 ## Introducción
 
-En el siguiente trabajo práctico se compararon diferentes tácticas y tecnologías para analizar cómo impacta en los atributos de calidad de un servicio HTTP implementado en Node con Express-js. Para ello, implementaremos una API que, mediante el consumo de otras APIs, brindará distintos datos a los usuarios. Con `Artillery` se someterá a los endpoints de la API a diversas intensidades de carga y con distintas configuraciones, para luego medir y analizar los resultados obtenidos.
+En este Trabajo Práctico, se compararon diferentes tácticas y tecnologías para analizar cómo es el impacto en los atributos de calidad de un servicio HTTP implementado en Node con Express. Para ello, se implementó una API que, mediante el consumo de otras APIs externas, brindará distintos datos a los usuarios. Junto con `Artillery`, se sometió a los endpoints a diversas intensidades de carga y distintas configuraciones, para medir y analizar los resultados obtenidos.
 
-El webserver que provee los distintos endpoints estará dockerizado con junto con los servicios que nos ayudarán a tomar mediciones sobre la API (`Graphite`, `Grafana` y `Cadvisor`), un servicio de base de datos para usar como caché (`Redis`) y un servicio de reverse proxy (`Nginx`).
+El webserver que provee los distintos endpoints se encuentra dockerizado con junto con los servicios que nos ayudaron a tomar las mediciones sobre la API (`Graphite`, `Grafana` y `Cadvisor`), un servicio de base de datos para utilizar como caché (`Redis`) y también `Nginx` como servicio de reverse proxy y balanceador de carga.
 
 Los endpoints que se desarrollaron para el webserver son los siguientes:
 
@@ -12,19 +12,19 @@ Los endpoints que se desarrollaron para el webserver son los siguientes:
 - `Spaceflight News`: para obtener las últimas noticias sobre actividad espacial
 - `Random Quote`: para obtener una cita famosa aleatoria.
 
-A la hora de comparar las distintas tácticas se evaluaran distintos escenarios:
-- Un caso base que simplemente hará request a los distintos endpoints
+A la hora de comparar las distintas tácticas se evaluaron distintos escenarios:
+- Un caso base donde simplemente se realizan solicitudes a los distintos endpoints
 - Uso de caching con mediante Redis
 - Escalando el servicio a 3 réplicas
 - Rate limiting para limitar el consumo de los distintos endpoint
 
 Para evaluar estos escenarios se generaron distintos escenarios de carga para un posterior análisis de cómo afecta a los atributos de calidad de la aplicación.
 
+## Escenarios
 
+### Base:
 
-# Sin tácticas 
-
-## Caso base
+El escenario base simula un caso de uso normal del servidor con baja tasa de solicitudes.
 
 ```yaml
 phases:
@@ -47,16 +47,9 @@ phases:
   arrivalRate: 2
 ```
 
-![img_9.png](img_9.png)
-![img_10.png](img_10.png)
-![img_11.png](img_11.png)
-![img_12.png](img_12.png)
-![img_13.png](img_13.png)
-![img_14.png](img_14.png)
-![img_15.png](img_15.png)
-![img_16.png](img_16.png)
+### Stress:
 
-## Stress
+El escenario stress simula un uso más exaustivo del servidor con un mayor número de solicitudes.
 
 ```yaml
 phases:
@@ -79,192 +72,103 @@ phases:
   arrivalRate: 2
 ```
 
-Empezó a fallar la api de Quote, el log de Node de las requests fallidas es el siguiente:
 
-```log
-2c23-tp-1-node-1      | AxiosError: Request failed with status code 429
-2c23-tp-1-node-1      |     at settle (/opt/app/node_modules/axios/dist/node/axios.cjs:1913:12)
-2c23-tp-1-node-1      |     at IncomingMessage.handleStreamEnd (/opt/app/node_modules/axios/dist/node/axios.cjs:2995:11)
-2c23-tp-1-node-1      |     at IncomingMessage.emit (node:events:529:35)
-2c23-tp-1-node-1      |     at endReadableNT (node:internal/streams/readable:1368:12)
-2c23-tp-1-node-1      |     at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
-2c23-tp-1-node-1      |   code: 'ERR_BAD_REQUEST',
-2c23-tp-1-node-1      |   config: {
-2c23-tp-1-node-1      |     transitional: {
-2c23-tp-1-node-1      |       silentJSONParsing: true,
-2c23-tp-1-node-1      |       forcedJSONParsing: true,
-2c23-tp-1-node-1      |       clarifyTimeoutError: false
-2c23-tp-1-node-1      |     },
-2c23-tp-1-node-1      |     adapter: 'http',
-2c23-tp-1-node-1      |     transformRequest: [ [Function: transformRequest] ],
-2c23-tp-1-node-1      |     transformResponse: [ [Function: transformResponse] ],
-2c23-tp-1-node-1      |     timeout: 0,
-2c23-tp-1-node-1      |     xsrfCookieName: 'XSRF-TOKEN',
-2c23-tp-1-node-1      |     xsrfHeaderName: 'X-XSRF-TOKEN',
-2c23-tp-1-node-1      |     maxContentLength: -1,
-2c23-tp-1-node-1      |     maxBodyLength: -1,
-2c23-tp-1-node-1      |     env: { FormData: [Function], Blob: [class Blob] },
-2c23-tp-1-node-1      |     validateStatus: [Function: validateStatus],
-2c23-tp-1-node-1      |     headers: Object [AxiosHeaders] {
-2c23-tp-1-node-1      |       Accept: 'application/json, text/plain, */*',
-2c23-tp-1-node-1      |       'Content-Type': undefined,
-2c23-tp-1-node-1      |       'User-Agent': 'axios/1.5.0',
-2c23-tp-1-node-1      |       'Accept-Encoding': 'gzip, compress, deflate, br'
-2c23-tp-1-node-1      |     },
-2c23-tp-1-node-1      |     method: 'get',
-2c23-tp-1-node-1      |     url: 'https://api.quotable.io/random',
-2c23-tp-1-node-1      |     data: undefined
+# Tácticas
 
-....
+## Caso sin tácticas
 
-2c23-tp-1-node-1      |   },
-2c23-tp-1-node-1      |   response: {
-2c23-tp-1-node-1      |     status: 429,
-2c23-tp-1-node-1      |     statusText: 'Too Many Requests',
-2c23-tp-1-node-1      |     headers: Object [AxiosHeaders] {
-2c23-tp-1-node-1      |       server: 'Cowboy',
-2c23-tp-1-node-1      |       connection: 'close',
-2c23-tp-1-node-1      |       'x-powered-by': 'Express',
-2c23-tp-1-node-1      |       'access-control-allow-origin': '*',
-2c23-tp-1-node-1      |       'ratelimit-limit': '220',
-2c23-tp-1-node-1      |       'ratelimit-remaining': '0',
-2c23-tp-1-node-1      |       'ratelimit-reset': '5',
-2c23-tp-1-node-1      |       'retry-after': '60',
-2c23-tp-1-node-1      |       'content-type': 'application/json; charset=utf-8',
-2c23-tp-1-node-1      |       'content-length': '54',
-2c23-tp-1-node-1      |       etag: 'W/"36-CyLO6/zPS4/+OW172LROq6sZ/l0"',
-2c23-tp-1-node-1      |       date: 'Tue, 03 Oct 2023 19:15:32 GMT',
-2c23-tp-1-node-1      |       via: '1.1 vegur'
-2c23-tp-1-node-1      |     },
-2c23-tp-1-node-1      |     config: {
-2c23-tp-1-node-1      |       transitional: [Object],
-2c23-tp-1-node-1      |       adapter: 'http',
-2c23-tp-1-node-1      |       transformRequest: [Array],
-2c23-tp-1-node-1      |       transformResponse: [Array],
-2c23-tp-1-node-1      |       timeout: 0,
-2c23-tp-1-node-1      |       xsrfCookieName: 'XSRF-TOKEN',
-2c23-tp-1-node-1      |       xsrfHeaderName: 'X-XSRF-TOKEN',
-2c23-tp-1-node-1      |       maxContentLength: -1,
-2c23-tp-1-node-1      |       maxBodyLength: -1,
-2c23-tp-1-node-1      |       env: [Object],
-2c23-tp-1-node-1      |       validateStatus: [Function: validateStatus],
-2c23-tp-1-node-1      |       headers: [Object [AxiosHeaders]],
-2c23-tp-1-node-1      |       method: 'get',
-2c23-tp-1-node-1      |       url: 'https://api.quotable.io/random',
-2c23-tp-1-node-1      |       data: undefined
-2c23-tp-1-node-1      |     },
-2c23-tp-1-node-1      |     request: <ref *1> ClientRequest {
-2c23-tp-1-node-1      |       _events: [Object: null prototype],
-2c23-tp-1-node-1      |       _eventsCount: 7,
-2c23-tp-1-node-1      |       _maxListeners: undefined,
-2c23-tp-1-node-1      |       outputData: [],
-2c23-tp-1-node-1      |       outputSize: 0,
-2c23-tp-1-node-1      |       writable: true,
-2c23-tp-1-node-1      |       destroyed: false,
-2c23-tp-1-node-1      |       _last: true,
-2c23-tp-1-node-1      |       chunkedEncoding: false,
-2c23-tp-1-node-1      |       shouldKeepAlive: false,
-2c23-tp-1-node-1      |       maxRequestsOnConnectionReached: false,
-2c23-tp-1-node-1      |       _defaultKeepAlive: true,
-2c23-tp-1-node-1      |       useChunkedEncodingByDefault: false,
-2c23-tp-1-node-1      |       sendDate: false,
-2c23-tp-1-node-1      |       _removedConnection: false,
-2c23-tp-1-node-1      |       _removedContLen: false,
-2c23-tp-1-node-1      |       _removedTE: false,
-2c23-tp-1-node-1      |       strictContentLength: false,
-2c23-tp-1-node-1      |       _contentLength: 0,
-2c23-tp-1-node-1      |       _hasBody: true,
-2c23-tp-1-node-1      |       _trailer: '',
-2c23-tp-1-node-1      |       finished: true,
-2c23-tp-1-node-1      |       _headerSent: true,
-2c23-tp-1-node-1      |       _closed: false,
-2c23-tp-1-node-1      |       socket: [TLSSocket],
-2c23-tp-1-node-1      |       _header: 'GET /random HTTP/1.1\r\n' +
-2c23-tp-1-node-1      |         'Accept: application/json, text/plain, */*\r\n' +
-2c23-tp-1-node-1      |         'User-Agent: axios/1.5.0\r\n' +
-2c23-tp-1-node-1      |         'Accept-Encoding: gzip, compress, deflate, br\r\n' +
-2c23-tp-1-node-1      |         'Host: api.quotable.io\r\n' +
-2c23-tp-1-node-1      |         'Connection: close\r\n' +
-2c23-tp-1-node-1      |         '\r\n',
-2c23-tp-1-node-1      |       _keepAliveTimeout: 0,
-2c23-tp-1-node-1      |       _onPendingData: [Function: nop],
-2c23-tp-1-node-1      |       agent: [Agent],
-2c23-tp-1-node-1      |       socketPath: undefined,
-2c23-tp-1-node-1      |       method: 'GET',
-2c23-tp-1-node-1      |       maxHeaderSize: undefined,
-2c23-tp-1-node-1      |       insecureHTTPParser: undefined,
-2c23-tp-1-node-1      |       joinDuplicateHeaders: undefined,
-2c23-tp-1-node-1      |       path: '/random',
-2c23-tp-1-node-1      |       _ended: true,
-2c23-tp-1-node-1      |       res: [IncomingMessage],
-2c23-tp-1-node-1      |       aborted: false,
-2c23-tp-1-node-1      |       timeoutCb: null,
-2c23-tp-1-node-1      |       upgradeOrConnect: false,
-2c23-tp-1-node-1      |       parser: null,
-2c23-tp-1-node-1      |       maxHeadersCount: null,
-2c23-tp-1-node-1      |       reusedSocket: false,
-2c23-tp-1-node-1      |       host: 'api.quotable.io',
-2c23-tp-1-node-1      |       protocol: 'https:',
-2c23-tp-1-node-1      |       _redirectable: [Writable],
-2c23-tp-1-node-1      |       [Symbol(kCapture)]: false,
-2c23-tp-1-node-1      |       [Symbol(kBytesWritten)]: 0,
-2c23-tp-1-node-1      |       [Symbol(kNeedDrain)]: false,
-2c23-tp-1-node-1      |       [Symbol(corked)]: 0,
-2c23-tp-1-node-1      |       [Symbol(kOutHeaders)]: [Object: null prototype],
-2c23-tp-1-node-1      |       [Symbol(errored)]: null,
-2c23-tp-1-node-1      |       [Symbol(kHighWaterMark)]: 16384,
-2c23-tp-1-node-1      |       [Symbol(kRejectNonStandardBodyWrites)]: false,
-2c23-tp-1-node-1      |       [Symbol(kUniqueHeaders)]: null
-2c23-tp-1-node-1      |     },
-2c23-tp-1-node-1      |     data: { statusCode: 429, statusMessage: 'Too Many Requests' }
-2c23-tp-1-node-1      |   }
-2c23-tp-1-node-1      | }
-```
+![Caso Sin Tácticas](tactica-sintactica.jpg)
 
-LLegando al maximo de requests por segundo a la api de Quote (270 por seg) el servidor empezó a devolver status 429. En el grafico de max api response time y mean api response time podemos ver que faltan puntos de entrada a partir del tiempo 16:14:00, eso es porque nos dejo de contestar por aprox 1 minuto, y lo mismo se repite despues. 
-
-En el log de la response vemos que el rate-limit del servidor son 220 requests, y dice "retry-after" 60 segundos. Esto condice con lo que vemos en los graficos. 
-
-Tambien se ve que el uso de cpu de nuestro servidor llego al 45% en su punto maximo. 
-
-Metar se ve que tiene picos de latencia alta, donde llega a 1.1 segundos de response time, mientras que en el promedio se mantiene en 200ms. 
+Este caso consta de una configuración inicial sin tácticas implementadas, donde simplemente se utiliza a Nginx como proxy reverso y un servidor (nodo) que se conecta con las APIs externas a cada solicitud recibida.
 
 
-![img_1.png](img_1.png)
-![img_2.png](img_2.png)
-![img_3.png](img_3.png)
-![img_4.png](img_4.png)
-![img_5.png](img_5.png)
-![img_6.png](img_6.png)
-![img_7.png](img_7.png)
-![img_8.png](img_8.png)
+### Escenario base:
+
+![base_caso_base_1.png](base_caso_base_1.png)
+En el primer gráfico podemos observar la cantidad de solicitudes al servidor desglosadas por endpoint. Y en el segundo gráfico los resultados de dichas solicitudes, destacando que todas fueron ejecutadas correctamente.
+
+![base_caso_base_2.png](base_caso_base_2.png)
+Estos gráficos representan el tiempo total de respuesta que le lleva a cada uno de los endpoints de la API, medido desde el lado del servidor.
+
+![base_caso_base_3.png](base_caso_base_3.png)
+Aquí se representa el tiempo de respuesta para obtener la información de cada API externa. Podemos observar que `/space_flight` y `/quote` son los cuales presentan mayor latencia, llegando a superar la unidad de segundos.
+
+![base_caso_base_4.png](base_caso_base_4.png)
+
+En el primer gráfico, vemos el tiempo de respuesta combinado desde el lado del cliente, que es similar al anterior mencionado pero se le agrega la latencia que se tiene hasta llegar finalmente al cliente.
+
+### Escenario stress:
+
+Al iniciarlo, empezamos a obtener fallas provenientes de la API de Quote.
+Del reporte de Node, pudimos obtener que se trata de errores 429 (too many requests) y que el servidor de destino especifica que el rate-limit es de 220 por minuto y un retry-after de 60 segundos.
+
+![stress_sin_tacticas_1.png](stress_sin_tacticas_1.png)
+![stress_sin_tacticas_2.png](stress_sin_tacticas_2.png)
+![stress_sin_tacticas_3.png](stress_sin_tacticas_3.png)
+
+Podemos observar que los endpoints con conexiones a APIs externas tienen una peor performance ante el estrés que el caso de `/ping`. También, `/metar` muestra ser el de mejor rendimiento en todas las pruebas con saltos en latencia más leves que los otros.
+
+![stress_sin_tacticas_4.png](stress_sin_tacticas_4.png)
+
+Aquí se puede observar que el `/quote` presenta un comportamiento lineal en periodos de 60 segundos y eso es debido a la limitación de solicitudes impuesta por el servidor externo. Durante ese periodo, todas las solicitudes fueron rechazadas.
+
+![stress_sin_tacticas_5.png](stress_sin_tacticas_5.png)
+
+Al tener un sólo nodo atendiendo todas las solicitudes, el CPU muestra un pico máximo de 47.6%, mientras que la memoria no sufrió cambios significativos en toda la prueba.
 
 
-# Caché
+## Técnica Caché
 
-## Caso base
+![Caso Caché](tactica-cache.jpg)
 
-![redis_caso_base_1.png](redis_caso_base_1.png)
-![redis_caso_base_2.png](redis_caso_base_2.png)
-![redis_caso_base_3.png](redis_caso_base_3.png)
-![redis_caso_base_4.png](redis_caso_base_4.png)
+Este caso tiene una implementacción de base de datos Redis para la caché. La información será almacenada por un periodo de 3 segundos para así disminuir la cantidad de solicitudes a las APIs externas.
 
 
-## Stress
+## Escenario base
 
-![redis_stress_1.png](redis_stress_1.png)
-![redis_stress_2.png](redis_stress_2.png)
-![redis_stress_3.png](redis_stress_3.png)
-![redis_stress_4.png](redis_stress_4.png)
+![base_con_cache_1.png](base_con_cache_1.png)
+![base_con_cache_2.png](base_con_cache_2.png)
+
+En el gráfico "Max endpoint response time", lo que se puede observar es que los picos donde la caché no fue utilizada. Como estos picos son los máximos dentro de la ventana de diez segundos, el grafico parece constante.
+
+Por otro lado el segundo gráfico "Mean endpoint response time", se observa que el tiempo promedio de latencia de los endpoint baja significativamente.
+
+Por ejemplo, si tomamos el caso de "Spaceflight", podemos ver que cuando realiza las solicitudes al servidor tarda 852ms en promedio, pero cuando utiliza la caché el promedio baja a 247ms.
+
+![base_con_cache_3.png](base_con_cache_3.png)
+![base_con_cache_4.png](base_con_cache_4.png)
+
+
+## Escenario stress
+
+![feli_stress_con_cache.png](feli_stress_con_cache.png)
+
+Aquí se puede observar un aumento de las solicitudes con errores. Esto se puede explicar por el endpoint "/quote", el cual no posee implementación de caché pero lo seguimos evaluando para su comparativa con el resto de los endpoint en términos de rendimiento general. También consideramos que dicha API externa no es tan robusta como las demás para este tipo de usos. 
+
+![feli_stress_con_cache_2.png](feli_stress_con_cache_2.png)
+
+Podemos observar que "Max endpoint response time" nos arroja unos resultados más constantes en el caso de "Spaceflight" y "Metar" comparando con el escenario Stress sin caché. Ya no aparecen picos de latencia alta.
+
+![feli_stress_con_cache_3.png](feli_stress_con_cache_3.png)
+![feli_stress_con_cache_4.png](feli_stress_con_cache_4.png)
+No se observan cambios significativos en el uso de la memoria.
 
 # Replicación
 
+![Caso Replicación](tactica-loadbalancer.jpg)
+
+En este caso, cambiamos la configuración de Nginx de Proxy reverso por el de Balanceador de carga. De esta forma, y agregando dos nodos más, Nginx se encargará de la distribución de las solicitudes de cada endpoint entre los tres nodos.
+
 ## Caso base
 
-![replicas_base_1.png](replicas_caso_base_1.png)
-![replicas_base_2.png](replicas_caso_base_2.png)
-![replicas_base_3.png](replicas_caso_base_3.png)
-![replicas_base_4.png](replicas_caso_base_4.png)
+![replicas_caso_base_1.png](replicas_caso_base_1.png)
+No se observaron errores en las solicitudes.
+
+![replicas_caso_base_2.png](replicas_caso_base_2.png)
+![replicas_caso_base_3.png](replicas_caso_base_3.png)
+![replicas_caso_base_4.png](replicas_caso_base_4.png)
+En este gráfico podemos observar que la distribución de carga del CPU y la memoria es equitativa entre los nodos. Si comparamos este escenario base con el de un solo nodo, podemos ver similitudes en los datos, por lo que consideramos que los valores de CPU y memoria son los mínimos para su funcionamiento y no dependen exclusivamente del uso de los endpoint.
+
 
 ## Stress
 
@@ -274,6 +178,11 @@ Metar se ve que tiene picos de latencia alta, donde llega a 1.1 segundos de resp
 ![replicas_stress_4.png](replicas_stress_4.png)
 
 # Rate limiting
+
+![Caso Rate limit](tactica-sintactica.jpg)
+
+Este caso, se agrega una limitación de 10 solicitudes por segundo.
+
 
 ## Caso base
 
@@ -290,6 +199,10 @@ Metar se ve que tiene picos de latencia alta, donde llega a 1.1 segundos de resp
 ![ratelimit_stress_4.png](ratelimit_stress_4.png)
 
 # Replicación + Caché 
+
+![Caso Loadbalancer-cache](tactica-loadbalancer-cache.jpg)
+
+Este caso, se combinan ambas técnicas de Replicación y caché.
 
 ## Caso base
 
