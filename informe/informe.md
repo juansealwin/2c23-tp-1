@@ -167,7 +167,9 @@ No se observaron errores en las solicitudes.
 ![replicas_caso_base_2.png](replicas_caso_base_2.png)
 ![replicas_caso_base_3.png](replicas_caso_base_3.png)
 ![replicas_caso_base_4.png](replicas_caso_base_4.png)
-En este gráfico podemos observar que la distribución de carga del CPU y la memoria es equitativa entre los nodos. Si comparamos este escenario base con el de un solo nodo, podemos ver similitudes en los datos, por lo que consideramos que los valores de CPU y memoria son los mínimos para su funcionamiento y no dependen exclusivamente del uso de los endpoint.
+En este gráfico podemos observar que la distribución de carga del CPU y la memoria es equitativa entre los nodos. 
+
+Si comparamos este escenario con el caso base de un solo nodo, podemos ver que la carga por nodo disminuyo. Es decir, se distribuyó el procesamiento de los pedidos en los tres nodos.
 
 
 ## Stress
@@ -191,6 +193,9 @@ Este caso, se agrega una limitación de 10 solicitudes por segundo.
 ![ratelimit_base_3.png](ratelimit_caso_base_3.png)
 ![ratelimit_base_4.png](ratelimit_caso_base_4.png)
 
+No hay se observaron diferencias significativas respecto del caso base sin rate limiting.
+
+
 ## Stress
 
 ![ratelimit_stress_1.png](ratelimit_stress_1.png)
@@ -211,10 +216,15 @@ Este caso, se combinan ambas técnicas de Replicación y caché.
 ![replicasyredis_base_3.png](replicasyredis_caso_base_3.png)
 ![replicasyredis_base_4.png](replicasyredis_caso_base_4.png)
 
+En este caso tuvimos mediciones similares a las de uso de caché con Redis. También podemos ver como se distribuyo la carga con los distintos nodos respecto del caso base (al igual como sucedió con el caso de replicas)
+
+
 ## Stress
+
 
 ![replicasyredis_stress_1.png](replicasyredis_stress_1.png)
 ![replicasyredis_stress_2.png](replicasyredis_stress_2.png)
-![replicasyredis_stress_3.png](replicasyredis_stress_3.png)
 ![replicasyredis_stress_4.png](replicasyredis_stress_4.png)
 
+Al igual que en el caso anterior las cargas fueron distribuidas en los distintos nodos. Por otro lado, pese al haber obtenido errores estos fueron mucho menos si los comparamos con el caso base con stress. 
+Por último, vemos que los tiempos de respuesta de los endpoints fueron muy bajos debido al uso de caché.
