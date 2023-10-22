@@ -41,6 +41,14 @@ scenarios:
     flow:
       - get:
           url: '/metar?station=SAEZ'
+      - get:
+          url: '/metar?station=SACO'
+      - get:
+          url: '/metar?station=SCBA'
+      - get:
+          url: '/metar?station=SAME'
+      - get:
+          url: '/metar?station=SAAR'
 
   - name: Spaceflight News (/spaceflight_news)
     weight: 1

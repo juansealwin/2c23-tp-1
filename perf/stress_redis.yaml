@@ -41,6 +41,14 @@ scenarios:
     flow:
       - get:
           url: '/metar?station=SAEZ&redis=true'
+      - get:
+          url: '/metar?station=SACO&redis=true'
+      - get:
+          url: '/metar?station=SCBA&redis=true'
+      - get:
+          url: '/metar?station=SAME&redis=true'
+      - get:
+          url: '/metar?station=SAAR&redis=true'
 
   - name: Spaceflight News with redis(/spaceflight_news)
     weight: 1
