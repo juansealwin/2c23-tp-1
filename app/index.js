@@ -43,7 +43,7 @@ app.get('/metar', async (req, res) => {
         if (!stationCode)
             return res.status(400).send("Especifique el aeródromo con ?station={code}");
 
-        const url = `https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&stationString=${stationCode}&hoursBeforeNow=1`;
+        const url = `https://aviationweather.gov/cgi-bin/data/metar.php?ids=${stationCode}&hours=0&format=xml&stationString=&hoursBeforeNow=1`;
 
         let response, decodedMetar;
 
