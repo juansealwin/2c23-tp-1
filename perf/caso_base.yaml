@@ -44,7 +44,7 @@ scenarios:
       - get:
           url: '/metar?station=SACO'
       - get:
-          url: '/metar?station=SCBA'
+          url: '/metar?station=SAZM'
       - get:
           url: '/metar?station=SAME'
       - get:

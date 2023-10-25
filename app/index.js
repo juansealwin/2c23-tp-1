@@ -106,7 +106,7 @@ app.get('/spaceflight_news', async (req, res) => {
                 statsd.gauge('customMetric.spaceflight_news_time_request', Date.now() - startRequestTime);
 
                 titles = response.data.map(item => item.title);
-                await redisClient.set('spaceflight_news', JSON.stringify(titles), {EX: 3});
+                await redisClient.set('spaceflight_news', JSON.stringify(titles), {EX: 5});
             
             }
 

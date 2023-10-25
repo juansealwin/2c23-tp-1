@@ -31,7 +31,7 @@ config:
 
 scenarios:
   - name: Ping (/ping)
-    weight: 1
+    weight: 0
     flow:
       - get:
           url: '/ping'
@@ -44,7 +44,7 @@ scenarios:
       - get:
           url: '/metar?station=SACO&redis=true'
       - get:
-          url: '/metar?station=SCBA&redis=true'
+          url: '/metar?station=SAZM&redis=true'
       - get:
           url: '/metar?station=SAME&redis=true'
       - get:
@@ -57,7 +57,7 @@ scenarios:
           url: '/spaceflight_news?redis=true'
 
   - name: Quote (/quote)
-    weight: 1
+    weight: 0
     flow:
       - get:
           url: '/quote'
