@@ -117,16 +117,14 @@ En el primer gráfico, vemos el tiempo de respuesta combinado desde el lado del 
 ### Escenario stress:
 
 Al iniciarlo, empezamos a obtener fallas provenientes de la API de Quote.
-Del reporte de Node, pudimos obtener que se trata de errores 429 (too many requests) y que el servidor de destino especifica que el rate-limit es de 220 por minuto y un retry-after de 60 segundos.
+Del reporte de NodeJS, pudimos obtener que se trata de errores 429 (too many requests) y que el servidor de destino especifica que el rate-limit es de 220 por minuto y un retry-after de 60 segundos.
 
 ![base_stress_1.png](base_stress_1.png)
 ![base_stress_2.png](base_stress_2.png)
 
-Podemos observar que los endpoints con conexiones a APIs externas tienen una peor performance ante el estrés que el caso de `/ping`. También, `/metar` muestra ser el de mejor rendimiento en todas las pruebas con saltos en latencia más leves que los otros.
+Podemos observar que los endpoints con conexiones a APIs externas tienen una peor performance ante el estrés que el caso de `/ping`. En el caso de `/metar`, se observa el de mejor rendimiento en todas las pruebas con saltos en latencia más leves que los otros.
 
 ![base_stress_3.png](base_stress_3.png)
-
-
 
 Al tener un sólo nodo atendiendo todas las solicitudes, el CPU muestra un pico máximo de casi 60%, mientras que la memoria no sufrió cambios significativos en toda la prueba.
 
