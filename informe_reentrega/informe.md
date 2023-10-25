@@ -197,15 +197,21 @@ Este caso, se agrega una limitación de 10 solicitudes por segundo.
 ## Caso base
 
 ![rate_limit_caso_base1.png](rate_limit_caso_base1.png)
+
+Como podemos ver las solicitudes completadas se mantienen como una constante y luego las que superan el umbral marcado con rate limiting son limitadas por nginx respondiendo con un codigo 503 (En el grafico se las marcó como "Error"). 
+
 ![rate_limit_caso_base2.png](rate_limit_caso_base2.png)
 ![rate_limit_caso_base3.png](rate_limit_caso_base3.png)
 
-No hay se observaron diferencias significativas respecto del caso base sin rate limiting.
+También se puede observar un uso menor del CPU si lo comparamos con el caso base sin tácticas, pasando de un uso promedio de 21,4% a un uso promedio de 4,22%. Esto en principio tiene sentido, ya que los pedidos por encima del umbral se los descarta directamente y la cantidad a procesar se hace mucho menor.
 
 
 ## Stress
 
 ![rate_limit_stress1.png](rate_limit_stress1.png)
+
+Nuevamente al igual que el caso base, notamos como los pedidos por encima del umbral (10 por segundo) son rechazados automaticamente.
+
 ![rate_limit_stress2.png](rate_limit_stress2.png)
 ![rate_limit_stress3.png](rate_limit_stress3.png)
 
