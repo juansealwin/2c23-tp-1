@@ -179,7 +179,7 @@
           },
           "refCount": 0,
           "refId": "B",
-          "target": "alias(stats.gauges.$server.scenarioCounts.Metar_-metar, 'Metar')",
+          "target": "alias(stats.gauges.$server.scenarioCounts.Metar_with_redis-metar, 'Metar')",
           "textEditor": false
         },
         {
@@ -190,7 +190,7 @@
           "hide": false,
           "refCount": 0,
           "refId": "C",
-          "target": "alias(stats.gauges.$server.scenarioCounts.Spaceflight_News_-spaceflight_news, 'Spaceflight')",
+          "target": "alias(stats.gauges.$server.scenarioCounts.Spaceflight_News_with_redis-spaceflight_news, 'Spaceflight')",
           "textEditor": false
         },
         {
@@ -385,12 +385,13 @@
         "legend": {
           "calcs": [
             "mean",
-            "lastNotNull",
             "max"
           ],
           "displayMode": "table",
           "placement": "right",
           "showLegend": true,
+          "sortBy": "Name",
+          "sortDesc": true,
           "width": 250
         },
         "tooltip": {
@@ -405,10 +406,10 @@
             "type": "graphite",
             "uid": "${DS_GRAPHITE}"
           },
+          "hide": false,
           "refCount": 0,
-          "refId": "B",
-          "target": "alias(sumSeries(stats.gauges.$server.errors.*), 'Errored')",
-          "textEditor": true
+          "refId": "E",
+          "target": "alias(stats.gauges.$server.codes.500, 'Error')"
         },
         {
           "datasource": {
@@ -435,17 +436,7 @@
           },
           "refCount": 0,
           "refId": "D",
-          "target": "alias(stats.gauges.$server.codes.429, 'Limited')"
-        },
-        {
-          "datasource": {
-            "type": "graphite",
-            "uid": "${DS_GRAPHITE}"
-          },
-          "hide": false,
-          "refCount": 0,
-          "refId": "E",
-          "target": "alias(stats.gauges.$server.codes.503, 'Error')"
+          "target": "alias(stats.gauges.$server.$container.ETIMEDOUT, 'Limited')"
         }
       ],
       "title": "Requests state (stacked)",
@@ -530,6 +521,32 @@
                 }
               }
             ]
+          },
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "Ping",
+                  "Metar",
+                  "Spaceflight"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
           }
         ]
       },
@@ -544,12 +561,14 @@
       "options": {
         "legend": {
           "calcs": [
-            "mean",
-            "max"
+            "max",
+            "min"
           ],
           "displayMode": "table",
           "placement": "right",
           "showLegend": true,
+          "sortBy": "Max",
+          "sortDesc": true,
           "width": 250
         },
         "tooltip": {
@@ -567,7 +586,7 @@
           "hide": false,
           "refCount": 0,
           "refId": "A",
-          "target": "alias(stats.gauges.customMetric.ping, 'Ping')"
+          "target": "alias(add(stats.gauges.customMetric.ping, 0.302), 'Ping')"
         },
         {
           "datasource": {
@@ -576,7 +595,7 @@
           },
           "refCount": 0,
           "refId": "C",
-          "target": "alias(stats.gauges.customMetric.metar, 'Metar')"
+          "target": "alias(add(stats.gauges.customMetric.metar, 0.314), 'Metar')"
         },
         {
           "datasource": {
@@ -586,7 +605,7 @@
           "hide": false,
           "refCount": 0,
           "refId": "B",
-          "target": "alias(stats.gauges.customMetric.spaceflight_news, 'Spaceflight')"
+          "target": "alias(add(stats.gauges.customMetric.spaceflight_news, 0.341), 'Spaceflight')"
         },
         {
           "datasource": {
@@ -681,6 +700,31 @@
                 }
               }
             ]
+          },
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "Metar",
+                  "Spaceflight"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
           }
         ]
       },
@@ -718,7 +762,7 @@
           "hide": false,
           "refCount": 0,
           "refId": "A",
-          "target": "alias(stats.gauges.customMetric.metar_time_request, 'Ping')"
+          "target": "alias(stats.gauges.customMetric.metar_time_request, 'Metar')"
         },
         {
           "datasource": {
@@ -727,7 +771,7 @@
           },
           "refCount": 0,
           "refId": "C",
-          "target": "alias(stats.gauges.customMetric.spaceflight_news_time_request, 'Metar')"
+          "target": "alias(stats.gauges.customMetric.spaceflight_news_time_request, 'Spaceflight')"
         },
         {
           "datasource": {
@@ -737,7 +781,7 @@
           "hide": false,
           "refCount": 0,
           "refId": "B",
-          "target": "alias(stats.gauges.customMetric.quote_time_request, 'Spaceflight')"
+          "target": "alias(stats.gauges.customMetric.quote_time_request, 'Quote')"
         }
       ],
       "title": "API response time ",
@@ -1081,7 +1125,7 @@
       "type": "timeseries"
     }
   ],
-  "refresh": "",
+  "refresh": "auto",
   "schemaVersion": 38,
   "style": "dark",
   "tags": [],
@@ -1168,7 +1212,7 @@
     ]
   },
   "time": {
-    "from": "now-3m",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {
