@@ -139,29 +139,35 @@ Este caso tiene una implementacción de base de datos Redis para la caché. La i
 ## Escenario base
 
 ![redis_caso_base1.png](redis_caso_base1.png)
+
+En esta táctica solo tomamos los endpoints de `METAR` y `Spaceflight news`, esto es debido a que eran los dos únicos que tenían sentido usarlos con esta mejora, ya que `ping` no consulta ninguna API externa y `quote` es random cada vez que se lo invoca, por lo que es innecesario almacenar datos para estos 2 endpoints. 
+
 ![redis_caso_base2.png](redis_caso_base2.png)
 
-En el gráfico "Max endpoint response time", lo que se puede observar es que los picos donde la caché no fue utilizada. Como estos picos son los máximos dentro de la ventana de diez segundos, el grafico parece constante.
+En el gráfico "Endpoint response time", podemos observar para el endpoint de `METAR` pequeños picos donde la caché es invalidada y requiere volver a buscar los datos de la API externa.
 
-Por otro lado el segundo gráfico "Mean endpoint response time", se observa que el tiempo promedio de latencia de los endpoint baja significativamente.
+Para el endpoint de `Spaceflight news` se visualiza el mismo efecto pero solo al principio. Además podemos ver que la diferencia de altura de los "picos" se debe al orden de magnitud de los tiempos de respuesta, siendo el máximo de `Spaceflight news` mucho mayor y provocando un corrimiento de la escala en el gráfico.
 
-Por ejemplo, si tomamos el caso de "Spaceflight", podemos ver que cuando realiza las solicitudes al servidor tarda 852ms en promedio, pero cuando utiliza la caché el promedio baja a 247ms.
+Para el "API response time" vemos que el tiempo en consultar las APIs externas se mantiene constante. 
 
 ![redis_caso_base3.png](redis_caso_base3.png)
+
+Si comparamos con el caso base sin tácticas, podemos ver que hay un uso menor de CPU pasando de 21,4% a 0,116% y además también hay un menor tiempo de respuesta del cliente, pasando de un promedio de 1.85seg a 1,23seg. Con esto podemos ver que en principio es una táctica eficiente cuando tiene sentido aplicarla en un endpoint.
 
 
 ## Escenario stress
 
 ![redis_stress1.png](redis_stress1.png)
 
-Aquí se puede observar un aumento de las solicitudes con errores. Esto se puede explicar por el endpoint "/quote", el cual no posee implementación de caché pero lo seguimos evaluando para su comparativa con el resto de los endpoint en términos de rendimiento general. También consideramos que dicha API externa no es tan robusta como las demás para este tipo de usos. 
+Nuevamente probamos solo con los endpoints que tenía sentido: `METAR` y `Spaceflight news`. Si comparamos con la versión de stress sin tácticas, usando la caché no tuvimos pedidos con errores
 
 ![redis_stress2.png](redis_stress2.png)
 
-Podemos observar que "Max endpoint response time" nos arroja unos resultados más constantes en el caso de "Spaceflight" y "Metar" comparando con el escenario Stress sin caché. Ya no aparecen picos de latencia alta.
+En "Endpoint response time" podemos ver que cuando se invalida la caché, el server tarda más ya que tiene que buscar de nuevo la información. Esto se puede ver en el pico de `Spaceflight news`, o bien en la media y los máximos de tiempo de respuesta para ambos endpoints, siendo la media más de diez veces menor a los tiempos máximos de respuesta. Nuevamente solo se puede apreciar graficamente un pico de `Spaceflight news` debidoa  que los máximos están en distintas magnitudes
 
 ![redis_stress3.png](redis_stress3.png)
-No se observan cambios significativos en el uso de la memoria.
+
+Si comparamos contra el caso sin tácticas bajo stress, podemos ver nuevamente un menor tiempo de respuesta promedio y un menor uso del CPU promedio.
 
 # Replicación
 
