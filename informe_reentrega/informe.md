@@ -10,9 +10,9 @@
   * Alvarez Windey Juan, 95242
   * Rettori Julián, 106581
 
-**Fecha de Entrega: 05 - 10 - 23**
+**Fecha de Entrega: 05/10/2023**
 
-**Fecha de Reentrega: 25 - 10 - 23**
+**Fecha de Reentrega: 25/10/2023**
 
 ---
 
@@ -20,22 +20,22 @@
 
 ## Introducción
 
-En este Trabajo Práctico, se compararon diferentes tácticas y tecnologías para analizar cómo es el impacto en los atributos de calidad de un servicio HTTP implementado en Node con Express. Para ello, se implementó una API que, mediante el consumo de otras APIs externas, brindará distintos datos a los usuarios. Junto con `Artillery`, se sometió a los endpoints a diversas intensidades de carga y distintas configuraciones, para medir y analizar los resultados obtenidos.
+En este Trabajo Práctico, se compararon diferentes tácticas y tecnologías para analizar cómo es el impacto en los atributos de calidad de un servicio HTTP implementado en NodeJS y Express. Para ello, se implementó una API que, mediante el consumo de otras APIs externas, brindará distintos datos a los usuarios. Junto con `Artillery`, se sometió a los endpoints a diversas intensidades de carga y distintas configuraciones para medir y analizar los resultados obtenidos.
 
 El webserver que provee los distintos endpoints se encuentra dockerizado con junto con los servicios que nos ayudaron a tomar las mediciones sobre la API (`Graphite`, `Grafana` y `Cadvisor`), un servicio de base de datos para utilizar como caché (`Redis`) y también `Nginx` como servicio de reverse proxy y balanceador de carga.
 
 Los endpoints que se desarrollaron para el webserver son los siguientes:
 
-- `Ping`: para healthcheck
-- `METAR`: para obtener información meteorológica de un aeródromo
-- `Spaceflight News`: para obtener las últimas noticias sobre actividad espacial
+- `Ping`: para health check.
+- `METAR`: para obtener información meteorológica de un aeródromo.
+- `Spaceflight News`: para obtener las últimas noticias sobre actividad espacial.
 - `Random Quote`: para obtener una cita famosa aleatoria.
 
 A la hora de comparar las distintas tácticas se evaluaron distintos escenarios:
-- Un caso base donde simplemente se realizan solicitudes a los distintos endpoints
-- Uso de caching con mediante Redis
-- Escalando el servicio a 3 réplicas
-- Rate limiting para limitar el consumo de los distintos endpoint
+- Un caso base donde simplemente se realizan solicitudes a los distintos endpoints.
+- Uso de caching con mediante Redis.
+- Escalando el servicio a 3 réplicas.
+- Rate limiting para limitar el consumo de los distintos endpoint.
 
 Para evaluar estos escenarios se generaron distintos escenarios de carga para un posterior análisis de cómo afecta a los atributos de calidad de la aplicación.
 
@@ -119,17 +119,16 @@ En el primer gráfico, vemos el tiempo de respuesta combinado desde el lado del 
 Al iniciarlo, empezamos a obtener fallas provenientes de la API de Quote.
 Del reporte de Node, pudimos obtener que se trata de errores 429 (too many requests) y que el servidor de destino especifica que el rate-limit es de 220 por minuto y un retry-after de 60 segundos.
 
-![base_stress1.png](base_stress1.png)
-![base_stress2.png](base_stress2.png)
-![base_stress3.png](base_stress3.png)
+![base_stress_1.png](base_stress_1.png)
+![base_stress_2.png](base_stress_2.png)
 
 Podemos observar que los endpoints con conexiones a APIs externas tienen una peor performance ante el estrés que el caso de `/ping`. También, `/metar` muestra ser el de mejor rendimiento en todas las pruebas con saltos en latencia más leves que los otros.
 
+![base_stress_3.png](base_stress_3.png)
 
-Aquí se puede observar que el `/quote` presenta un comportamiento lineal en periodos de 60 segundos y eso es debido a la limitación de solicitudes impuesta por el servidor externo. Durante ese periodo, todas las solicitudes fueron rechazadas.
 
 
-Al tener un sólo nodo atendiendo todas las solicitudes, el CPU muestra un pico máximo de 47.6%, mientras que la memoria no sufrió cambios significativos en toda la prueba.
+Al tener un sólo nodo atendiendo todas las solicitudes, el CPU muestra un pico máximo de casi 60%, mientras que la memoria no sufrió cambios significativos en toda la prueba.
 
 
 ## Técnica Caché
