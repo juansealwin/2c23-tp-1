@@ -258,3 +258,8 @@ Al igual que en el caso anterior, las cargas fueron distribuidas en los distinto
 Por último, vemos que los tiempos de respuesta de los endpoints fueron muy bajos debido al uso de caché.
 
 ## Conclusión
+La táctica con caché resultó ser la más óptima porque nos permitió bajar la cantidad de errores a cero, ya que el mayor factor limitante fueron las APIs externas. Además si se quisiera soportar una mayor cantidad de tráfico o solicitudes, se podría aumentar el tiempo de caché para así disminuir la frecuencia de actualización de los datos.
+
+En contraste, tácticas como el "rate limiting" no fueron tan efectivas para reducir errores en las APIs externas. Pensamos que estas tácticas podrían ser más adecuadas en situaciones donde hay escasez de recursos en nuestra infraestructura, más que en las APIs externas.
+
+De esta manera, creemos que no existe una solución universal, y que cada situación merece su evalución individual para determinar la táctica más efectiva.
