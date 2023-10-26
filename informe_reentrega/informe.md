@@ -133,14 +133,13 @@ Al tener un sólo nodo atendiendo todas las solicitudes, el CPU muestra un pico 
 
 ![Caso Caché](tactica-cache.jpg)
 
-Este caso tiene una implementacción de base de datos Redis para la caché. La información será almacenada por un periodo de 3 segundos para así disminuir la cantidad de solicitudes a las APIs externas.
-
+Este caso tiene una implementacción de base de datos Redis para la caché. La información será almacenada por un periodo de 5 segundos para disminuir la cantidad de solicitudes a las APIs externas. Este periodo fue elegido ya que es el tiempo mínimo de cacheo que requieren dichas APIs para no tener errores en las pruebas de estrés. En el caso de que se requiera soportar más consultas a nuestros endpoints podríamos aumentar el tiempo de duración en caché ya que spaceflights_news no suele actualizarse tan frecuentemente.
 
 ## Escenario base
 
 ![redis_caso_base1.png](redis_caso_base1.png)
 
-En esta táctica solo tomamos los endpoints de `METAR` y `Spaceflight news`, esto es debido a que eran los dos únicos que tenían sentido usarlos con esta mejora, ya que `ping` no consulta ninguna API externa y `quote` es random cada vez que se lo invoca, por lo que es innecesario almacenar datos para estos 2 endpoints. 
+En esta táctica sólo tomamos los endpoints de `METAR` y `Spaceflight news`, esto es debido a que eran los dos únicos que tenían sentido usarlos con esta mejora, ya que `ping` no consulta ninguna API externa y `quote` es random cada vez que se lo invoca, por lo que es innecesario almacenar datos para estos 2 endpoints. 
 
 ![redis_caso_base2.png](redis_caso_base2.png)
 
@@ -159,7 +158,7 @@ Si comparamos con el caso base sin tácticas, podemos ver que hay un uso menor d
 
 ![redis_stress1.png](redis_stress1.png)
 
-Nuevamente probamos solo con los endpoints que tenía sentido: `METAR` y `Spaceflight news`. Si comparamos con la versión de stress sin tácticas, usando la caché no tuvimos pedidos con errores
+Nuevamente probamos sólo con los endpoints que tenía sentido: `METAR` y `Spaceflight news`. Si comparamos con la versión de stress sin tácticas, usando la caché no tuvimos pedidos con errores
 
 ![redis_stress2.png](redis_stress2.png)
 
@@ -181,17 +180,27 @@ En este caso, cambiamos la configuración de Nginx de Proxy reverso por el de Ba
 No se observaron errores en las solicitudes.
 
 ![replicas_caso_base2.png](replicas_caso_base2.png)
-![replicas_caso_base3.png](replicas_caso_base3.png)
-En este gráfico podemos observar que la distribución de carga del CPU y la memoria es equitativa entre los nodos. 
 
-Si comparamos este escenario con el caso base de un solo nodo, podemos ver que la carga por nodo disminuyo. Es decir, se distribuyó el procesamiento de los pedidos en los tres nodos.
+
+![replicas_caso_base3.png](replicas_caso_base3.png)
+En este gráfico podemos observar que la distribución de carga del CPU y la memoria es medianamente igual entre los nodos. 
+
+Si comparamos este escenario con el caso base de un solo nodo, podemos ver que la carga por nodo disminuyó ua se distribuyó el procesamiento de los pedidos en los tres nodos.
 
 
 ## Stress
 
 ![replicas_stress1.png](replicas_stress1.png)
+
+En este caso, podemos ver que la API externa es un limitante a la  cantidad de solicitudes independientemente de la táctica de balanceador de carga.
+
 ![replicas_stress2.png](replicas_stress2.png)
+
 ![replicas_stress3.png](replicas_stress3.png)
+
+Aquí el uso de CPU se ve reducido notablemente gracias a la distribución de solicitudes en distintos nodos.
+
+
 
 # Rate limiting
 
@@ -216,10 +225,12 @@ También se puede observar un uso menor del CPU si lo comparamos con el caso bas
 
 ![rate_limit_stress1.png](rate_limit_stress1.png)
 
-Nuevamente al igual que el caso base, notamos como los pedidos por encima del umbral (10 por segundo) son rechazados automaticamente.
+Nuevamente al igual que el caso base, notamos como los pedidos por encima del umbral (10 por segundo) son rechazados automaticamente. El valor de "Completed" no es 10, debido a que las estadísticas se agrupan y se actualizan cada 10 segundos.
 
 ![rate_limit_stress2.png](rate_limit_stress2.png)
 ![rate_limit_stress3.png](rate_limit_stress3.png)
+
+En terminos generales, podemos ver un comportamiento similar al obtenido en la tactica 1 y sin mejoras significativas. En casos de estrés, pueden verse una mayor amplitud en el tiempo de ejecución.
 
 # Replicación + Caché 
 
@@ -243,5 +254,7 @@ En este caso tuvimos mediciones similares a las de uso de caché con Redis. Tamb
 ![replicasyredis_stress2.png](replicasyredis_stress2.png)
 ![replicasyredis_stress3.png](replicasyredis_stress3.png)
 
-Al igual que en el caso anterior las cargas fueron distribuidas en los distintos nodos. Por otro lado, pese al haber obtenido errores estos fueron mucho menos si los comparamos con el caso base con stress. 
+Al igual que en el caso anterior, las cargas fueron distribuidas en los distintos nodos. Por otro lado, pese al haber obtenido errores, estos fueron muchos menos que si los comparamos con el caso base de stress. 
 Por último, vemos que los tiempos de respuesta de los endpoints fueron muy bajos debido al uso de caché.
+
+## Conclusión
